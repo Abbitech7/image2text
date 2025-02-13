@@ -43,7 +43,7 @@ async def handle_photo(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
     except Exception as e:
         logger.error(f"Error processing photo: {e}")
         await update.message.reply_text("There was an error processing the photo. Please try again.")
-update.message.reply_text("Processing please wait")
+Update.message.reply_text("Processing please wait")
 async def error_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     logger.error(f"Update {update} caused error {context.error}")
 
