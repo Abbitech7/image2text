@@ -13,6 +13,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     await update.message.reply_text('Send me an image and I will convert it to text!')
 
 async def handle_photo(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    await update.message.reply_text("Processing Please wait.")
     try:
         photo_file = update.message.photo[-1]
 
@@ -43,7 +44,7 @@ async def handle_photo(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
     except Exception as e:
         logger.error(f"Error processing photo: {e}")
         await update.message.reply_text("There was an error processing the photo. Please try again.")
-Update.message.reply_text("Processing please wait")
+ 
 async def error_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     logger.error(f"Update {update} caused error {context.error}")
 
@@ -52,7 +53,6 @@ def main() -> None:
 
     application.add_handler(CommandHandler("start", start))
     application.add_handler(MessageHandler(filters.PHOTO, handle_photo))
-
     application.add_error_handler(error_handler)
 
     application.run_polling()
