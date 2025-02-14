@@ -66,7 +66,7 @@ async def error_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> N
 async def check_member(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     user_status = update.chat_member.new_chat_member.status
     if user_status not in ['member', 'administrator', 'creator']:
-        await context.bot.kick_chat_member(chat_id=update.effective_chat.id, user_id=update.effective_user.id)
+        await context.bot.kick_chat_member(chat_id=CHANNEL_ID, user_id=update.effective_user.id)
         await context.bot.send_message(chat_id=update.effective_user.id, text="Please join the channel before using the bot.")
     else:
         await context.bot.send_message(chat_id=update.effective_user.id, text="Welcome to the channel! You can now use the bot.")
