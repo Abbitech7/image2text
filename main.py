@@ -1,18 +1,15 @@
 import logging
 import os
-import aiofiles
 import requests
 from telegram import Update, Message, BotCommand
 from telegram.ext import ApplicationBuilder, CommandHandler, MessageHandler, ChatMemberHandler, filters, ContextTypes
 from dotenv import load_dotenv
 
-# Load environment variables
 load_dotenv()
 TELEGRAM_TOKEN = os.getenv("TELEGRAM_TOKEN")
 OCR_API_KEY = os.getenv("OCR_API_KEY")
 CHANNEL_ID = "@programmerat"
 
-# Logging setup
 logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
     level=logging.INFO
@@ -28,11 +25,10 @@ async def handle_photo(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
         photo_file = update.message.photo[-1]
         file = await photo_file.get_file()
 
-        # Download image asynchronously
-        async with aiofiles.open('image.jpg', 'wb') as out_file:
-            await out_file.write(await file.download_as_bytearray())
+        file_bytes = await file.download_as_bytearray()
+        with open('image.jpg', 'wb') as out_file:
+            out_file.write(file_bytes)
 
-        # Send image to OCR API
         with open('image.jpg', 'rb') as image_file:
             response = requests.post(
                 'https://api.ocr.space/parse/image',
@@ -40,7 +36,6 @@ async def handle_photo(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
                 files={'file': image_file}
             )
 
-        # Process OCR response
         if response.status_code == 200:
             result = response.json()
             if result.get('ParsedResults'):
@@ -52,7 +47,6 @@ async def handle_photo(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
             await update.message.reply_text("Error processing the image with OCR API.")
             logger.error(f"Error: {response.status_code} - {response.text}")
 
-        # Clean up
         os.remove('image.jpg')
         await context.bot.delete_message(chat_id=update.effective_chat.id, message_id=processing_message.message_id)
 
@@ -74,7 +68,6 @@ async def check_member(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
 def main() -> None:
     application = ApplicationBuilder().token(TELEGRAM_TOKEN).build()
 
-    # Set bot commands
     commands = [
         BotCommand("start", "Start the bot and get instructions"),
     ]
